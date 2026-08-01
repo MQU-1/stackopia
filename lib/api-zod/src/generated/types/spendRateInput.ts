@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface SpendRateInput {
+  /** What was purchased */
+  item: string;
+  /** Amount in JD */
+  amount: number;
+  /** Optional context about the purchase */
+  context?: string;
 }

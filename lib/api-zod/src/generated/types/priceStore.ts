@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface PriceStore {
+  name: string;
+  /** Store type (e.g. "Local Tech Store", "Amazon") */
+  type: string;
+  note: string;
+  /** Price in JD */
+  price: number;
 }

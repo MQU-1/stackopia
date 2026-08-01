@@ -6,6 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface SavingsCircle {
+  id: number;
+  name: string;
+  goalName: string;
+  /** Target in JD */
+  goalAmount: number;
+  /** Amount saved so far in JD */
+  savedAmount: number;
+  deadline: Date;
+  createdAt: Date;
 }

@@ -5,7 +5,10 @@
  * Stackopia API — AI-powered financial coaching, savings circles, invest plans, price hunting, and tribe matching.
  * OpenAPI spec version: 0.1.0
  */
+import type { PriceStore } from './priceStore';
 
-export interface HealthStatus {
-  status: string;
+export interface PriceHuntResult {
+  title: string;
+  stores: PriceStore[];
+  tip: string;
 }

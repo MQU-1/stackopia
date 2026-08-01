@@ -6,6 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface TribeProfile {
+  id: number;
+  name: string;
+  goal: string;
+  city: string;
+  /** @nullable */
+  bio?: string | null;
+  createdAt: Date;
 }

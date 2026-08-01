@@ -5,7 +5,10 @@
  * Stackopia API — AI-powered financial coaching, savings circles, invest plans, price hunting, and tribe matching.
  * OpenAPI spec version: 0.1.0
  */
+import type { InvestPlanInputRisk } from './investPlanInputRisk';
 
-export interface HealthStatus {
-  status: string;
+export interface InvestPlanInput {
+  /** Amount available to invest in JD */
+  amount: number;
+  risk: InvestPlanInputRisk;
 }

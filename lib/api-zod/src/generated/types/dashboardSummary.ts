@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface DashboardSummary {
+  /** Sum of all savedAmount across circles in JD */
+  totalSaved: number;
+  circleCount: number;
+  tribeCount: number;
+  /** Number of AI queries made today */
+  aiQueriesToday: number;
 }

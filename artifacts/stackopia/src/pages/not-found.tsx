@@ -1,21 +1,31 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import { Card, CardContent } from "@workspace/stackopia-ds/components/ui/card";
+import { Button } from "@workspace/stackopia-ds/components/ui/button";
+import { Link } from "wouter";
+import { AlertCircle } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
+    <div className="min-h-[100dvh] w-full flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
         <CardContent className="pt-6">
           <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">
-              404 Page Not Found
+            <AlertCircle className="h-8 w-8 text-destructive" />
+            <h1 className="text-2xl font-bold text-foreground">
+              404 Not Found
             </h1>
           </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
-          </p>
+          <Card className="border border-border bg-muted/30 mb-4">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">
+                This page doesn't exist. You may have mistyped the URL.
+              </p>
+            </CardContent>
+          </Card>
+          <Link href="/">
+            <Button className="w-full" data-testid="button-go-home">
+              Back to Home
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

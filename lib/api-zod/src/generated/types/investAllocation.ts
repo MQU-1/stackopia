@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface InvestAllocation {
+  label: string;
+  percent: number;
+  /** Hex color code for the chart segment */
+  color: string;
 }

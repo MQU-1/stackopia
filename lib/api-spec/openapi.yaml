@@ -180,7 +180,7 @@ paths:
           name: id
           required: true
           schema:
-            type: integer
+            type: number
       responses:
         "200":
           description: Savings circle
@@ -205,7 +205,7 @@ paths:
           name: id
           required: true
           schema:
-            type: integer
+            type: number
       requestBody:
         required: true
         content:
@@ -338,7 +338,7 @@ components:
       required: [score, verdict, insight]
       properties:
         score:
-          type: integer
+          type: number
           minimum: 1
           maximum: 10
         verdict:
@@ -427,7 +427,7 @@ components:
       required: [id, name, goalName, goalAmount, savedAmount, deadline, createdAt]
       properties:
         id:
-          type: integer
+          type: number
         name:
           type: string
         goalName:
@@ -474,7 +474,7 @@ components:
       required: [id, name, goal, city, createdAt]
       properties:
         id:
-          type: integer
+          type: number
         name:
           type: string
         goal:
@@ -510,9 +510,9 @@ components:
           type: number
           description: Sum of all savedAmount across circles in JD
         circleCount:
-          type: integer
+          type: number
         tribeCount:
-          type: integer
+          type: number
         aiQueriesToday:
-          type: integer
+          type: number
           description: Number of AI queries made today

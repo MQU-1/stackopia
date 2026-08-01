@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface PriceHuntInput {
+  /** Product to search for */
+  query: string;
 }

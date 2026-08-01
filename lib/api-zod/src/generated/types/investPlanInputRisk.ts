@@ -6,6 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
-}
+export type InvestPlanInputRisk = typeof InvestPlanInputRisk[keyof typeof InvestPlanInputRisk];
+
+
+export const InvestPlanInputRisk = {
+  safe: 'safe',
+  balanced: 'balanced',
+  growth: 'growth',
+  halal: 'halal',
+} as const;
