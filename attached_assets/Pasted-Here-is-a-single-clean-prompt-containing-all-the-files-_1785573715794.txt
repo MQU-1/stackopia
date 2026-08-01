@@ -1,0 +1,449 @@
+Here is a single, clean prompt containing all the files and instructions. You can copy everything in the block below and paste it directly into Replit's AI assistant or chat tool.
+
+```text
+Please set up this full-stack web application project called Stackopia. 
+
+Here is the exact file structure and code that needs to be created:
+
+1. Root Directory -> index.js (Backend Node.js & Express Server)
+2. public Folder -> index.html (Frontend UI)
+3. public Folder -> style.css (Frontend Styling)
+4. public Folder -> app.js (Frontend Client Logic)
+
+--- CODE FOR index.js ---
+const express = require('express');
+const cors = require('cors');
+const Anthropic = require('@anthropic-ai/sdk');
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(express.static('public'));
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+app.post('/api/ai-proxy', async (req, res) => {
+  try {
+    const data = req.body;
+    let systemPrompt = "You are a financial assistant. You must respond strictly in valid JSON format, with no markdown formatting or conversational text.";
+    let userMessage = "";
+
+    if (data.type === 'spend') {
+      userMessage = `
+        Evaluate this purchase: ${data.item} for JD ${data.amount}. Context: ${data.ctx}.
+        Return ONLY a JSON object with:
+        - "score": A number from 1-10.
+        - "verdict": A short string (e.g., "Great Investment", "Impulse Buy", "Terrible Idea").
+        - "insight": A brutally honest 2-sentence explanation.
+      `;
+    } 
+    else if (data.type === 'invest') {
+      userMessage = `
+        Create a simple investment plan for JD ${data.amount} with a "${data.risk}" risk profile.
+        Return ONLY a JSON object with:
+        - "summary": A 1-sentence overview.
+        - "allocations": An array of objects, each containing "label" (string), "percent" (number), and "color" (a hex code string like "#C8F135"). The percents must add up to 100.
+        - "advice": A 2-sentence piece of practical advice.
+      `;
+    }
+    else if (data.type === 'price') {
+      userMessage = `
+        Estimate local Amman and online prices for: ${data.query}.
+        Return ONLY a JSON object with:
+        - "title": "Price check for ${data.query}"
+        - "stores": An array of 3 objects, each containing "name", "type" (e.g., "Local Tech Store", "Amazon"), "note" (e.g., "Includes warranty"), and "price" (a number representing JD). Order from cheapest to most expensive.
+        - "tip": 1 sentence of buying advice.
+      `;
+    } 
+    else {
+      return res.status(400).json({ error: "Invalid request type" });
+    }
+
+    const msg = await anthropic.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 500,
+      temperature: 0.7,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMessage }],
+    });
+
+    const aiText = msg.content[0].text;
+    const aiJson = JSON.parse(aiText);
+
+    res.json(aiJson);
+
+  } catch (error) {
+    console.error("AI Service Error:", error);
+    res.status(500).json({ error: "Failed to generate AI response." });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Secure AI Proxy running on port ${PORT}`);
+});
+
+--- CODE FOR public/index.html ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' https://fonts.googleapis.com; connect-src 'self'; img-src 'self' data:;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <title>Stackopia — Build Wealth Together</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300..600;1,300..600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <div class="logo" data-nav="home" tabindex="0">Stack<span>opia</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-nav="home">Home</button>
+    <button class="nav-tab" data-nav="spend">🧾 Spend Rater</button>
+    <button class="nav-tab" data-nav="savings">🏦 Savings Circle</button>
+    <button class="nav-tab" data-nav="invest">📈 Invest Coach</button>
+    <button class="nav-tab" data-nav="prices">🔍 Price Hunt</button>
+    <button class="nav-tab" data-nav="tribe">🤝 Find Tribe</button>
+  </div>
+  <div class="nav-badge">PROTOTYPE</div>
+</nav>
+
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-tag">🚀 Your financial evolution starts here</div>
+    <h1>Build wealth.<br><span class="hi">Together.</span><br><span class="dim">Smarter.</span></h1>
+    <p class="hero-sub">AI-powered financial coaching, group savings, smart investing, price hunting — and a community of people who think like you. All in one place.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-primary" data-nav="spend">Try Spend Rater →</button>
+      <button class="btn btn-ghost" data-nav="savings">See Savings Circle</button>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-box"><div class="stat-num">AI</div><div class="stat-lbl">Powered financial coach, 24/7</div></div>
+    <div class="stat-box"><div class="stat-num">5</div><div class="stat-lbl">Core features in one app</div></div>
+    <div class="stat-box"><div class="stat-num">JD 0</div><div class="stat-lbl">Wasted on bad spending decisions</div></div>
+    <div class="stat-box"><div class="stat-num">∞</div><div class="stat-lbl">People with same goals nearby</div></div>
+  </div>
+  <div class="features">
+    <div class="feat" data-nav="spend"><span class="feat-icon">🧾</span><div class="feat-title">Spend Rater</div><div class="feat-desc">Tell the AI what you bought. It scores the decision 1–10 and tells you whether it was worth it — honestly.</div><div class="feat-cta">Try it live →</div></div>
+    <div class="feat" data-nav="savings"><span class="feat-icon">🏦</span><div class="feat-title">Savings Circle</div><div class="feat-desc">Save money with friends. Everyone commits to a goal. Public progress means no one can quietly fail.</div><div class="feat-cta">See it →</div></div>
+    <div class="feat" data-nav="invest"><span class="feat-icon">📈</span><div class="feat-title">Invest Coach</div><div class="feat-desc">Enter how much you saved and your risk comfort. AI tells you exactly where to put it in plain language.</div><div class="feat-cta">Get advice →</div></div>
+    <div class="feat" data-nav="prices"><span class="feat-icon">🔍</span><div class="feat-title">Price Hunter</div><div class="feat-desc">Search any product. Get the cheapest price across online stores and local shops in your city instantly.</div><div class="feat-cta">Hunt prices →</div></div>
+    <div class="feat" data-nav="tribe"><span class="feat-icon">🤝</span><div class="feat-title">Find Your Tribe</div><div class="feat-desc">Connect with people who have the same financial goals as you. In your city or online. Accountability at scale.</div><div class="feat-cta">Find people →</div></div>
+    <div class="feat feat-disabled"><span class="feat-icon">🧠</span><div class="feat-title">Investor Mindset</div><div class="feat-desc">Weekly challenges, bite-sized lessons, and daily habits that rewire how you think about money forever.</div><div class="feat-cta text-muted">Coming soon</div></div>
+  </div>
+</div>
+
+<div class="page" id="page-spend">
+  <div class="demo">
+    <div class="demo-head"><h2>🧾 Rate My Spending</h2><p>Enter what you bought and how much. The AI will give it a score out of 10 — and be brutally honest about whether it was a good decision.</p></div>
+    <div class="card">
+      <div class="irow"><input class="inp" id="spend-item" placeholder="What did you buy? (e.g. Nike shoes, Netflix, dinner out)" /><input class="inp inp-sm" id="spend-amount" type="number" placeholder="Amount (JD)" /></div>
+      <div class="irow"><input class="inp" id="spend-context" placeholder="Any context? (e.g. I was bored, needed it for work, it was on sale...)" /></div>
+      <button class="btn btn-primary w-100" id="btn-rate-spend">Rate This Purchase →</button>
+    </div>
+    <div class="loading" id="spend-loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>AI is judging your financial choices...</div>
+    <div class="card rating-result" id="rating-result" style="display:none;">
+      <div class="score-header"><div><div class="score-big" id="score-num">—</div><div class="score-sub">out of 10</div></div><div id="verdict-badge" class="verdict-badge vg">—</div></div>
+      <div class="score-bar-track"><div class="score-bar-fill" id="score-bar"></div></div>
+      <div class="insight-text" id="insight-text"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-savings">
+  <div class="demo">
+    <div class="demo-head"><h2>🏦 Savings Circle</h2><p>You and your friends commit to a shared savings goal. Everyone's progress is visible. No one can quietly disappear.</p></div>
+    <div class="card">
+      <div class="circle-hdr" style="display:flex; justify-content:space-between; margin-bottom:15px;">
+        <div><div class="circle-name" style="font-weight:bold;">🎯 Jordan Trip Fund</div><div class="circle-goal-lbl" style="font-size:12px; color:var(--muted);">Goal: JD 2,000 · Deadline: Aug 2025</div></div>
+        <div style="text-align:right;"><div class="circle-total" style="font-weight:bold; color:var(--accent);">JD 1,340</div><div class="circle-of" style="font-size:12px; color:var(--muted);">of JD 2,000 saved</div></div>
+      </div>
+      <div class="prog-wrap mb-1" style="background:var(--card2); height:10px; border-radius:5px; overflow:hidden;"><div class="prog-fill" id="prog1" style="background:var(--accent); width:0; height:100%; transition:width 1s ease;"></div></div>
+      <div class="circle-meta" style="font-size:12px; color:var(--muted); margin-bottom:20px;">67% complete · JD 660 remaining · 74 days left</div>
+      <div class="irow mt-3 mb-0"><input class="inp" id="add-amount" type="number" placeholder="Add savings (JD)" /><button class="btn btn-primary btn-sm" id="btn-add-savings">Add →</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-invest">
+  <div class="demo">
+    <div class="demo-head"><h2>📈 Invest Coach</h2><p>Tell the AI how much you've saved and how you feel about risk. It'll build you a simple, clear investment plan — no jargon.</p></div>
+    <div class="card">
+      <div class="irow"><input class="inp" id="invest-amt" type="number" placeholder="How much have you saved? (JD)" /></div>
+      <div class="risk-title">Your risk comfort level:</div>
+      <div class="risk-grid">
+        <div class="risk-opt sel" data-risk="safe"><div class="risk-opt-t">🛡️ Play it safe</div><div class="risk-opt-d">Stability first. Slow but steady growth.</div></div>
+        <div class="risk-opt" data-risk="balanced"><div class="risk-opt-t">⚖️ Balanced</div><div class="risk-opt-d">Some risk is fine if returns are good.</div></div>
+        <div class="risk-opt" data-risk="growth"><div class="risk-opt-t">🚀 Growth mode</div><div class="risk-opt-d">I'm young and can handle volatility.</div></div>
+        <div class="risk-opt" data-risk="halal"><div class="risk-opt-t">☪️ Halal only</div><div class="risk-opt-d">Sharia-compliant investments only please.</div></div>
+      </div>
+      <button class="btn btn-primary w-100" id="btn-get-invest">Build My Investment Plan →</button>
+    </div>
+    <div class="loading" id="invest-loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>Building your personalized plan...</div>
+    <div class="card" id="invest-result" style="display:none;">
+      <div class="invest-res-title">Your Investment Breakdown</div>
+      <div class="invest-res-sub" id="invest-summary"></div>
+      <div class="alloc-bar" id="alloc-bar"></div>
+      <div class="invest-legend" id="invest-legend"></div>
+      <div class="invest-advice" id="invest-advice"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-prices">
+  <div class="demo">
+    <div class="demo-head"><h2>🔍 Price Hunter</h2><p>Search any product and get the cheapest price compared across major online platforms and local stores in Amman.</p></div>
+    <div class="card">
+      <div class="irow mb-0"><input class="inp" id="price-q" placeholder="Search a product... (e.g. iPhone 15, PS5, Nike Air Force 1)" /><button class="btn btn-primary btn-sm" id="btn-hunt-prices">Hunt →</button></div>
+    </div>
+    <div class="loading" id="price-loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>Scanning prices across stores...</div>
+    <div id="price-results" style="display:none;">
+      <div class="price-res-title" id="price-title"></div>
+      <div id="price-list"></div>
+      <div class="price-tip" id="price-tip"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-tribe">
+  <div class="demo">
+    <div class="demo-head"><h2>🤝 Find Your Tribe</h2><p>People in your city with the exact same financial goals. Connect online, meet in person, hold each other accountable.</p></div>
+    <div class="card p-3">
+      <div class="irow mb-0">
+        <select class="inp" id="tribe-goal"><option value="">Filter by goal...</option><option>Save JD 5,000 this year</option></select>
+        <select class="inp inp-sm" id="tribe-city"><option>Amman</option><option>Online only</option></select>
+      </div>
+    </div>
+    <div class="card text-center mt-3"><button class="btn btn-primary" id="btn-tribe-signup">Create My Profile →</button></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
+
+--- CODE FOR public/style.css ---
+:root {
+  --black: #080808; --card: #111111; --card2: #181818; --border: #222222;
+  --accent: #C8F135; --accent2: #7EE8A2; --accent3: #FFD166; --text: #F0F0F0; --muted: #666666; --red: #FF6B6B;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+.w-100 { width: 100%; } .mb-0 { margin-bottom: 0 !important; } .mb-1 { margin-bottom: 6px; } .mt-3 { margin-top: 16px; } .p-3 { padding: 16px; } .text-center { text-align: center; } .text-muted { color: var(--muted) !important; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(8,8,8,0.96); backdrop-filter: blur(16px); z-index: 100; }
+.logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 22px; cursor: pointer; }
+.logo span { color: var(--accent); }
+.nav-tabs { display: flex; gap: 3px; background: var(--card); padding: 4px; border-radius: 12px; border: 1px solid var(--border); }
+.nav-tab { padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; color: var(--muted); border: none; background: none; font-family: 'DM Sans', sans-serif; }
+.nav-tab.active { background: var(--accent); color: var(--black); font-weight: 700; }
+.nav-tab:hover:not(.active) { color: var(--text); }
+.nav-badge { background: rgba(200,241,53,0.15); color: var(--accent); border: 1px solid rgba(200,241,53,0.3); font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 20px; font-family: 'Syne', sans-serif; }
+.page { display: none; animation: fadeUp 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.hero { padding: 72px 40px 48px; max-width: 1100px; margin: 0 auto; }
+.hero-tag { display: inline-flex; gap: 8px; background: rgba(200,241,53,0.08); border: 1px solid rgba(200,241,53,0.25); color: var(--accent); font-size: 11px; font-weight: 700; padding: 6px 14px; border-radius: 20px; margin-bottom: 28px; font-family: 'Syne', sans-serif; text-transform: uppercase; }
+.hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(52px, 7.5vw, 92px); font-weight: 800; line-height: 1.0; margin-bottom: 24px; }
+.hero h1 .hi { color: var(--accent); } .hero h1 .dim { color: #333; }
+.hero-sub { font-size: 17px; color: var(--muted); max-width: 500px; line-height: 1.65; margin-bottom: 40px; font-weight: 300; }
+.hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { border: none; padding: 14px 26px; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.2s; }
+.btn-primary { background: var(--accent); color: var(--black); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(200,241,53,0.25); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); font-family: 'DM Sans', sans-serif; }
+.btn-sm { padding: 10px 18px; font-size: 13px; border-radius: 10px; }
+.stats-strip { display: flex; gap: 1px; background: var(--border); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 0 56px; }
+.stat-box { flex: 1; background: var(--black); padding: 28px 32px; text-align: center; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 800; color: var(--accent); }
+.stat-lbl { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 1100px; margin: 0 auto 60px; padding: 0 40px; }
+.feat { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; }
+.feat::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.35s; }
+.feat:hover:not(.feat-disabled) { transform: translateY(-4px); border-color: #2a2a2a; }
+.feat:hover:not(.feat-disabled)::after { transform: scaleX(1); }
+.feat-disabled { border-color: rgba(200,241,53,0.12); background: rgba(200,241,53,0.03); cursor: default; }
+.feat-icon { font-size: 30px; margin-bottom: 14px; display: block; }
+.feat-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.feat-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.feat-cta { margin-top: 16px; font-size: 12px; color: var(--accent); font-weight: 700; font-family: 'Syne', sans-serif; }
+.demo { max-width: 780px; margin: 0 auto; padding: 40px 40px 80px; }
+.demo-head h2 { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; margin-bottom: 6px; }
+.demo-head p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 30px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 26px; margin-bottom: 14px; }
+.irow { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.inp { flex: 1; min-width: 180px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; color: var(--text); font-size: 14px; outline: none; }
+.inp:focus { border-color: var(--accent); }
+.inp-sm { flex: 0 0 130px; min-width: 130px; }
+.loading { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; padding: 16px 0; }
+.loading.show { display: flex; }
+.dots { display: flex; gap: 4px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; } .dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%, 80%, 100% { transform: scale(0.55); opacity: 0.35; } 40% { transform: scale(1); opacity: 1; } }
+.score-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; gap:12px; }
+.score-big { font-family: 'Syne', sans-serif; font-size: 58px; font-weight: 800; line-height: 1; }
+.score-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.verdict-badge { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif; display: inline-block; }
+.vg { background: rgba(126,232,162,0.12); color: var(--accent2); border: 1px solid rgba(126,232,162,0.25); }
+.vo { background: rgba(255,209,102,0.12); color: var(--accent3); border: 1px solid rgba(255,209,102,0.25); }
+.vb { background: rgba(255,107,107,0.12); color: var(--red); border: 1px solid rgba(255,107,107,0.25); }
+.score-bar-track { background: var(--card2); border-radius: 8px; height: 8px; overflow: hidden; margin: 16px 0; }
+.score-bar-fill { height: 100%; border-radius: 8px; transition: width 1.2s ease; width: 0; }
+.insight-text { font-size: 14px; color: var(--muted); line-height: 1.75; border-top: 1px solid var(--border); padding-top: 16px; }
+.risk-title { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 18px; }
+.risk-opt { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.2s; }
+.risk-opt:hover, .risk-opt.sel { border-color: var(--accent); background: rgba(200,241,53,0.05); }
+.risk-opt-t { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.risk-opt-d { font-size: 12px; color: var(--muted); }
+.invest-res-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; margin-bottom:4px; }
+.invest-res-sub { font-size:13px; color:var(--muted); }
+.alloc-bar { display: flex; height: 10px; border-radius: 6px; overflow: hidden; gap: 2px; margin: 16px 0 10px; }
+.alloc-seg { height: 100%; border-radius: 3px; }
+.invest-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; margin-bottom: 16px; color: var(--muted); }
+.legend-dot { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+.invest-advice { font-size: 14px; color: var(--muted); line-height: 1.8; border-top: 1px solid var(--border); padding-top: 16px; }
+.price-res-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; }
+.price-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; background: var(--card2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+.price-row.best { border-color: var(--accent); background: rgba(200,241,53,0.04); }
+.price-store { font-weight: 600; font-size: 14px; }
+.price-type { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.price-amt { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; }
+.best-badge { font-size: 10px; font-weight: 700; color: var(--accent); font-family: 'Syne', sans-serif; text-transform: uppercase; margin-left: 6px; }
+.price-tip { margin-top: 14px; padding: 15px 18px; background: rgba(200,241,53,0.07); border: 1px solid rgba(200,241,53,0.2); border-radius: 10px; font-size: 13px; color: var(--accent); }
+
+--- CODE FOR public/app.js ---
+document.addEventListener('DOMContentLoaded', () => {
+  let selectedRisk = 'safe';
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', (e) => { showPage(e.currentTarget.getAttribute('data-nav')); });
+  });
+  document.querySelectorAll('.risk-opt').forEach(el => {
+    el.addEventListener('click', (e) => {
+      selectedRisk = e.currentTarget.getAttribute('data-risk');
+      document.querySelectorAll('.risk-opt').forEach(r => r.classList.remove('sel'));
+      e.currentTarget.classList.add('sel');
+    });
+  });
+  document.getElementById('btn-rate-spend')?.addEventListener('click', rateSpend);
+  document.getElementById('btn-get-invest')?.addEventListener('click', getInvest);
+  document.getElementById('btn-hunt-prices')?.addEventListener('click', huntPrices);
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const activeTab = document.querySelector(`.nav-tab[data-nav="${id}"]`);
+    if(activeTab) activeTab.classList.add('active');
+    if (id === 'savings') { setTimeout(() => { document.getElementById('prog1').style.width = '67%'; }, 80); }
+  }
+
+  async function callAIBackend(promptData) {
+    const res = await fetch('/api/ai-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(promptData)
+    });
+    if(!res.ok) throw new Error("Backend AI service error");
+    return await res.json();
+  }
+
+  async function rateSpend() {
+    const item = document.getElementById('spend-item').value.trim();
+    const amount = document.getElementById('spend-amount').value.trim();
+    const ctx = document.getElementById('spend-context').value.trim();
+    if (!item || !amount) { alert('Please fill in the purchase and amount.'); return; }
+    const loading = document.getElementById('spend-loading');
+    const result = document.getElementById('rating-result');
+    loading.classList.add('show'); result.style.display = 'none';
+    try {
+      const r = await callAIBackend({ type: 'spend', item, amount, ctx });
+      loading.classList.remove('show');
+      document.getElementById('score-num').textContent = r.score + '/10';
+      const bar = document.getElementById('score-bar');
+      bar.style.background = r.score >= 7 ? 'var(--accent2)' : r.score >= 4 ? 'var(--accent3)' : 'var(--red)';
+      setTimeout(() => bar.style.width = (r.score * 10) + '%', 80);
+      const badge = document.getElementById('verdict-badge');
+      badge.textContent = r.verdict;
+      badge.className = 'verdict-badge ' + (r.score >= 7 ? 'vg' : r.score >= 4 ? 'vo' : 'vb');
+      document.getElementById('insight-text').textContent = r.insight;
+      result.style.display = 'block';
+    } catch(e) {
+      loading.classList.remove('show');
+      alert('Error calling AI proxy.');
+    }
+  }
+
+  async function getInvest() {
+    const amt = document.getElementById('invest-amt').value.trim();
+    if (!amt) { alert('Enter your saved amount first.'); return; }
+    const loading = document.getElementById('invest-loading');
+    const result = document.getElementById('invest-result');
+    loading.classList.add('show'); result.style.display = 'none';
+    try {
+      const r = await callAIBackend({ type: 'invest', amount: amt, risk: selectedRisk });
+      loading.classList.remove('show');
+      document.getElementById('invest-summary').textContent = r.summary;
+      const bar = document.getElementById('alloc-bar');
+      const legend = document.getElementById('invest-legend');
+      bar.innerHTML = ''; legend.innerHTML = '';
+      r.allocations.forEach(a => {
+        const seg = document.createElement('div');
+        seg.className = 'alloc-seg'; seg.style.width = a.percent + '%'; seg.style.background = a.color;
+        bar.appendChild(seg);
+        const li = document.createElement('div');
+        const colorBox = document.createElement('span'); colorBox.className = 'legend-dot'; colorBox.style.background = a.color;
+        const percentStrong = document.createElement('strong'); percentStrong.style.color = 'var(--text)'; percentStrong.textContent = a.percent + '%';
+        li.appendChild(colorBox); li.appendChild(document.createTextNode(a.label + ' ')); li.appendChild(percentStrong);
+        legend.appendChild(li);
+      });
+      document.getElementById('invest-advice').textContent = r.advice;
+      result.style.display = 'block';
+    } catch(e) {
+      loading.classList.remove('show');
+      alert('Error calling AI proxy.');
+    }
+  }
+
+  async function huntPrices() {
+    const q = document.getElementById('price-q').value.trim();
+    if (!q) { alert('Enter a product name first.'); return; }
+    const loading = document.getElementById('price-loading');
+    const results = document.getElementById('price-results');
+    loading.classList.add('show'); results.style.display = 'none';
+    try {
+      const r = await callAIBackend({ type: 'price', query: q });
+      loading.classList.remove('show');
+      document.getElementById('price-title').textContent = r.title;
+      const list = document.getElementById('price-list');
+      list.innerHTML = '';
+      r.stores.forEach((s, i) => {
+        const row = document.createElement('div');
+        row.className = 'price-row' + (i === 0 ? ' best' : '');
+        const storeDiv = document.createElement('div');
+        storeDiv.className = 'price-store';
+        storeDiv.textContent = s.name;
+        if (i === 0) {
+          const badge = document.createElement('span'); badge.className = 'best-badge'; badge.textContent = '⚡ Best Price';
+          storeDiv.appendChild(badge);
+        }
+        const typeDiv = document.createElement('div'); typeDiv.className = 'price-type'; typeDiv.textContent = s.type + ' · ' + s.note;
+        const leftCol = document.createElement('div'); leftCol.appendChild(storeDiv); leftCol.appendChild(typeDiv);
+        const rightCol = document.createElement('div'); rightCol.className = 'price-amt'; rightCol.style.color = i === 0 ? 'var(--accent)' : 'var(--text)';
+        rightCol.textContent = 'JD ' + s.price;
+        row.appendChild(leftCol); row.appendChild(rightCol); list.appendChild(row);
+      });
+      document.getElementById('price-tip').textContent = '💡 ' + r.tip;
+      results.style.display = 'block';
+    } catch(e) {
+      loading.classList.remove('show');
+      alert('Error calling AI proxy.');
+    }
+  }
+});
+
+```
