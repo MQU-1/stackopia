@@ -14,11 +14,21 @@ export interface ErrorResponse {
 }
 
 export interface SpendRateInput {
-  /** What was purchased */
+  /**
+     * What was purchased
+     * @maxLength 200
+     */
   item: string;
-  /** Amount in JD */
+  /**
+     * Amount in JD
+     * @minimum 0
+     * @maximum 10000000
+     */
   amount: number;
-  /** Optional context about the purchase */
+  /**
+     * Optional context about the purchase
+     * @maxLength 1000
+     */
   context?: string;
 }
 
@@ -28,9 +38,15 @@ export interface SpendRateResult {
      * @maximum 10
      */
   score: number;
-  /** Short verdict label (e.g. "Great Investment") */
+  /**
+     * Short verdict label (e.g. "Great Investment")
+     * @maxLength 100
+     */
   verdict: string;
-  /** Two-sentence honest explanation */
+  /**
+     * Two-sentence honest explanation
+     * @maxLength 1000
+     */
   insight: string;
 }
 
@@ -45,47 +61,73 @@ export const InvestPlanInputRisk = {
 } as const;
 
 export interface InvestPlanInput {
-  /** Amount available to invest in JD */
+  /**
+     * Amount available to invest in JD
+     * @minimum 0
+     * @maximum 100000000
+     */
   amount: number;
   risk: InvestPlanInputRisk;
 }
 
 export interface InvestAllocation {
+  /** @maxLength 60 */
   label: string;
   percent: number;
-  /** Hex color code for the chart segment */
+  /**
+     * Hex color code for the chart segment
+     * @pattern ^#[0-9a-fA-F]{6}$
+     */
   color: string;
 }
 
 export interface InvestPlanResult {
+  /** @maxLength 2000 */
   summary: string;
   allocations: InvestAllocation[];
+  /** @maxLength 2000 */
   advice: string;
 }
 
 export interface PriceHuntInput {
-  /** Product to search for */
+  /**
+     * Product to search for
+     * @maxLength 200
+     */
   query: string;
 }
 
 export interface PriceStore {
+  /** @maxLength 100 */
   name: string;
-  /** Store type (e.g. "Local Tech Store", "Amazon") */
+  /**
+     * Store type (e.g. "Local Tech Store", "Amazon")
+     * @maxLength 60
+     */
   type: string;
+  /** @maxLength 500 */
   note: string;
-  /** Price in JD */
+  /**
+     * Price in JD
+     * @minimum 0
+     * @maximum 100000000
+     */
   price: number;
 }
 
 export interface PriceHuntResult {
+  /** @maxLength 200 */
   title: string;
   stores: PriceStore[];
+  /** @maxLength 1000 */
   tip: string;
 }
 
 export interface SavingsCircle {
   id: number;
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 120 */
   goalName: string;
   /** Target in JD */
   goalAmount: number;
@@ -96,32 +138,69 @@ export interface SavingsCircle {
 }
 
 export interface SavingsCircleInput {
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 120 */
   goalName: string;
+  /**
+     * @minimum 1
+     * @maximum 100000000
+     */
   goalAmount: number;
   deadline: string;
 }
 
 export interface ContributionInput {
-  /** Amount to add in JD */
+  /**
+     * Amount to add in JD
+     * @minimum 0.01
+     * @maximum 100000000
+     */
   amount: number;
 }
 
 export interface TribeProfile {
   id: number;
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 200 */
   goal: string;
+  /** @maxLength 120 */
   city: string;
-  /** @nullable */
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
   bio?: string | null;
   createdAt: string;
 }
 
 export interface TribeProfileInput {
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 200 */
   goal: string;
+  /** @maxLength 120 */
   city: string;
+  /** @maxLength 1000 */
   bio?: string;
+}
+
+export interface WaitlistInput {
+  /**
+     * Email address to join the waitlist
+     * @maxLength 254
+     * @pattern ^[^\s@]+@[^\s@]+\.[^\s@]+$
+     */
+  email: string;
+  /** @maxLength 200 */
+  website?: string;
+}
+
+export interface WaitlistEntry {
+  id: number;
+  email: string;
+  createdAt: string;
 }
 
 export interface DashboardSummary {
@@ -134,7 +213,13 @@ export interface DashboardSummary {
 }
 
 export type ListTribesParams = {
+/**
+ * @maxLength 120
+ */
 city?: string;
+/**
+ * @maxLength 200
+ */
 goal?: string;
 };
 

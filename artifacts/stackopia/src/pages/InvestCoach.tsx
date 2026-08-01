@@ -12,6 +12,7 @@ import { useGetInvestPlan } from "@workspace/api-client-react";
 import type { InvestPlanResult } from "@workspace/api-client-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { cn } from "@workspace/stackopia-ds/lib/utils";
+import { PageHeader } from "../components/PageHeader";
 
 const riskOptions = [
   { value: "safe", label: "Safe", description: "Low risk, steady returns" },
@@ -150,10 +151,11 @@ export default function InvestCoach() {
 
   return (
     <div className="min-h-[100dvh] max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Invest Coach</h1>
-        <p className="text-muted-foreground text-sm">Set your risk level, get a personalised AI investment breakdown.</p>
-      </div>
+      <PageHeader
+        eyebrow="AI allocation coach"
+        title="Invest Coach"
+        description="Set your risk level, get a personalised AI investment breakdown."
+      />
 
       <Card data-testid="card-invest-form">
         <CardHeader>

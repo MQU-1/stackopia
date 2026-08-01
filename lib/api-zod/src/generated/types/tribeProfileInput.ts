@@ -7,8 +7,12 @@
  */
 
 export interface TribeProfileInput {
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 200 */
   goal: string;
+  /** @maxLength 120 */
   city: string;
+  /** @maxLength 1000 */
   bio?: string;
 }

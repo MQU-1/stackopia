@@ -13,7 +13,7 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
@@ -209,7 +209,7 @@ export function buildTokens() {
   writeFileSync(faviconOut, buildFavicon(tokens));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   buildTokens();
   process.stdout.write(
     "Generated src/index.css, src/generated/tokens.tsx, and public/favicon.svg\n",

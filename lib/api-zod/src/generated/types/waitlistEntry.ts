@@ -6,13 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface InvestAllocation {
-  /** @maxLength 60 */
-  label: string;
-  percent: number;
-  /**
-     * Hex color code for the chart segment
-     * @pattern ^#[0-9a-fA-F]{6}$
-     */
-  color: string;
+export interface WaitlistEntry {
+  id: number;
+  email: string;
+  createdAt: Date;
 }

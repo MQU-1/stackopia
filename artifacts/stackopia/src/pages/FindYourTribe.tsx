@@ -18,6 +18,7 @@ import {
 } from "@workspace/api-client-react";
 import type { TribeProfile } from "@workspace/api-client-react";
 import { Users, Plus, MapPin, Target, Search, X } from "lucide-react";
+import { PageHeader } from "../components/PageHeader";
 
 const createSchema = z.object({
   name: z.string().min(1, "Name required"),
@@ -194,12 +195,15 @@ export default function FindYourTribe() {
 
   return (
     <div className="min-h-[100dvh] max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">Find Your Tribe</h1>
-          <p className="text-muted-foreground text-sm">Connect with Jordanians working toward the same financial goals.</p>
+      <div className="flex items-start justify-between mb-8 gap-4">
+        <PageHeader
+          eyebrow="Community"
+          title="Find Your Tribe"
+          description="Connect with Jordanians working toward the same financial goals."
+        />
+        <div className="shrink-0">
+          <CreateProfileDialog />
         </div>
-        <CreateProfileDialog />
       </div>
 
       {/* Filters */}

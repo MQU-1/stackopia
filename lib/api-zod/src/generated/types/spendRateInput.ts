@@ -7,10 +7,20 @@
  */
 
 export interface SpendRateInput {
-  /** What was purchased */
+  /**
+     * What was purchased
+     * @maxLength 200
+     */
   item: string;
-  /** Amount in JD */
+  /**
+     * Amount in JD
+     * @minimum 0
+     * @maximum 10000000
+     */
   amount: number;
-  /** Optional context about the purchase */
+  /**
+     * Optional context about the purchase
+     * @maxLength 1000
+     */
   context?: string;
 }

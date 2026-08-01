@@ -34,7 +34,9 @@ import type {
   SpendRateInput,
   SpendRateResult,
   TribeProfile,
-  TribeProfileInput
+  TribeProfileInput,
+  WaitlistEntry,
+  WaitlistInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -140,6 +142,77 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
 
 
 
+
+export const getJoinWaitlistUrl = () => {
+
+
+
+
+  return `/api/waitlist`
+}
+
+/**
+ * @summary Join the launch waitlist
+ */
+export const joinWaitlist = async (waitlistInput: WaitlistInput, options?: Parameters<typeof customFetch>[1]): Promise<WaitlistEntry> => {
+
+  return customFetch<WaitlistEntry>(getJoinWaitlistUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(waitlistInput)
+  }
+);}
+
+
+
+
+
+export const getJoinWaitlistMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<WaitlistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<WaitlistInput>}, TContext> => {
+
+const mutationKey = ['joinWaitlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof joinWaitlist>>, {data: BodyType<WaitlistInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  joinWaitlist(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type JoinWaitlistMutationResult = NonNullable<Awaited<ReturnType<typeof joinWaitlist>>>
+    export type JoinWaitlistMutationBody = BodyType<WaitlistInput>
+    export type JoinWaitlistMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Join the launch waitlist
+ */
+export const useJoinWaitlist = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<WaitlistInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof joinWaitlist>>,
+        TError,
+        {data: BodyType<WaitlistInput>},
+        TContext
+      > => {
+      return useMutation(getJoinWaitlistMutationOptions(options));
+    }
 
 export const getRateSpendUrl = () => {
 

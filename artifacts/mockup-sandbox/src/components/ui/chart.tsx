@@ -64,6 +64,17 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{3,8}$/
+const CSS_VAR_COLOR_RE = /^hsl\(var\(--[a-z0-9-]+\)\)$/i
+
+function sanitizeChartColor(color: string | undefined): string | null {
+  if (!color) return null
+  const trimmed = color.trim()
+  if (HEX_COLOR_RE.test(trimmed)) return trimmed
+  if (CSS_VAR_COLOR_RE.test(trimmed)) return trimmed
+  return null
+}
+
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color
@@ -82,9 +93,10 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 ${prefix} [data-chart=${id}] {
 ${colorConfig
   .map(([key, itemConfig]) => {
-    const color =
+    const rawColor =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
+    const color = sanitizeChartColor(rawColor)
     return color ? `  --color-${key}: ${color};` : null
   })
   .join("\n")}

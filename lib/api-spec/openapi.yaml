@@ -18,6 +18,8 @@ tags:
     description: Tribe community
   - name: dashboard
     description: Summary and stats
+  - name: waitlist
+    description: Launch waitlist
 
 paths:
   /healthz:
@@ -32,6 +34,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Waitlist ─────────────────────────────────────────────────────────────────
+
+  /waitlist:
+    post:
+      operationId: joinWaitlist
+      tags: [waitlist]
+      summary: Join the launch waitlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WaitlistInput"
+      responses:
+        "201":
+          description: Added to waitlist
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaitlistEntry"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   # ─── AI endpoints ────────────────────────────────────────────────────────────
 
@@ -245,11 +280,13 @@ paths:
           required: false
           schema:
             type: string
+            maxLength: 120
         - in: query
           name: goal
           required: false
           schema:
             type: string
+            maxLength: 200
       responses:
         "200":
           description: List of tribe profiles
@@ -326,12 +363,16 @@ components:
         item:
           type: string
           description: What was purchased
+          maxLength: 200
         amount:
           type: number
           description: Amount in JD
+          minimum: 0
+          maximum: 10000000
         context:
           type: string
           description: Optional context about the purchase
+          maxLength: 1000
 
     SpendRateResult:
       type: object
@@ -344,9 +385,11 @@ components:
         verdict:
           type: string
           description: Short verdict label (e.g. "Great Investment")
+          maxLength: 100
         insight:
           type: string
           description: Two-sentence honest explanation
+          maxLength: 1000
 
     InvestPlanInput:
       type: object
@@ -355,6 +398,8 @@ components:
         amount:
           type: number
           description: Amount available to invest in JD
+          minimum: 0
+          maximum: 100000000
         risk:
           type: string
           enum: [safe, balanced, growth, halal]
@@ -365,11 +410,13 @@ components:
       properties:
         label:
           type: string
+          maxLength: 60
         percent:
           type: number
         color:
           type: string
           description: Hex color code for the chart segment
+          pattern: "^#[0-9a-fA-F]{6}$"
 
     InvestPlanResult:
       type: object
@@ -377,12 +424,14 @@ components:
       properties:
         summary:
           type: string
+          maxLength: 2000
         allocations:
           type: array
           items:
             $ref: "#/components/schemas/InvestAllocation"
         advice:
           type: string
+          maxLength: 2000
 
     PriceHuntInput:
       type: object
@@ -391,6 +440,7 @@ components:
         query:
           type: string
           description: Product to search for
+          maxLength: 200
 
     PriceStore:
       type: object
@@ -398,14 +448,19 @@ components:
       properties:
         name:
           type: string
+          maxLength: 100
         type:
           type: string
           description: Store type (e.g. "Local Tech Store", "Amazon")
+          maxLength: 60
         note:
           type: string
+          maxLength: 500
         price:
           type: number
           description: Price in JD
+          minimum: 0
+          maximum: 100000000
 
     PriceHuntResult:
       type: object
@@ -413,12 +468,14 @@ components:
       properties:
         title:
           type: string
+          maxLength: 200
         stores:
           type: array
           items:
             $ref: "#/components/schemas/PriceStore"
         tip:
           type: string
+          maxLength: 1000
 
     # ── Savings schemas ─────────────────────────────────────────────────────────
 
@@ -430,8 +487,10 @@ components:
           type: number
         name:
           type: string
+          maxLength: 120
         goalName:
           type: string
+          maxLength: 120
         goalAmount:
           type: number
           description: Target in JD
@@ -451,10 +510,14 @@ components:
       properties:
         name:
           type: string
+          maxLength: 120
         goalName:
           type: string
+          maxLength: 120
         goalAmount:
           type: number
+          minimum: 1
+          maximum: 100000000
         deadline:
           type: string
           format: date
@@ -466,6 +529,8 @@ components:
         amount:
           type: number
           description: Amount to add in JD
+          minimum: 0.01
+          maximum: 100000000
 
     # ── Tribe schemas ───────────────────────────────────────────────────────────
 
@@ -477,12 +542,16 @@ components:
           type: number
         name:
           type: string
+          maxLength: 120
         goal:
           type: string
+          maxLength: 200
         city:
           type: string
+          maxLength: 120
         bio:
           type: ["string", "null"]
+          maxLength: 1000
         createdAt:
           type: string
           format: date-time
@@ -493,12 +562,44 @@ components:
       properties:
         name:
           type: string
+          maxLength: 120
         goal:
           type: string
+          maxLength: 200
         city:
           type: string
+          maxLength: 120
         bio:
           type: string
+          maxLength: 1000
+
+    # ── Waitlist schemas ────────────────────────────────────────────────────────
+
+    WaitlistInput:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          description: Email address to join the waitlist
+          pattern: "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+          maxLength: 254
+        # Honeypot field — real users never see it; bots tend to fill it.
+        website:
+          type: string
+          maxLength: 200
+
+    WaitlistEntry:
+      type: object
+      required: [id, email, createdAt]
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
 
     # ── Dashboard schemas ────────────────────────────────────────────────────────
 

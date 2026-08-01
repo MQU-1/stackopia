@@ -8,7 +8,9 @@
 
 export interface SavingsCircle {
   id: number;
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 120 */
   goalName: string;
   /** Target in JD */
   goalAmount: number;

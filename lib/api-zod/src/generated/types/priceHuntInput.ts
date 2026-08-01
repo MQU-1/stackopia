@@ -7,6 +7,9 @@
  */
 
 export interface PriceHuntInput {
-  /** Product to search for */
+  /**
+     * Product to search for
+     * @maxLength 200
+     */
   query: string;
 }

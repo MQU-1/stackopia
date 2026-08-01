@@ -6,6 +6,7 @@ import {
   CreateTribeProfileBody,
   ListTribesQueryParams,
 } from "@workspace/api-zod";
+import { mutationRateLimit } from "../middlewares/rate-limit";
 
 const router: IRouter = Router();
 
@@ -40,7 +41,7 @@ router.get("/tribes", async (req, res) => {
 
 // ─── POST /tribes ─────────────────────────────────────────────────────────────
 
-router.post("/tribes", async (req, res) => {
+router.post("/tribes", mutationRateLimit, async (req, res) => {
   const parsed = CreateTribeProfileBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });

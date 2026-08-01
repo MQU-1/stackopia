@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@workspace/stackopia-ds/components/ui/toaster";
 import { TooltipProvider } from "@workspace/stackopia-ds/components/ui/tooltip";
 import { Route, Switch, Router as WouterRouter } from "wouter";
+import { I18nProvider } from "./lib/i18n";
 import { Nav } from "./components/Nav";
 import Home from "./pages/Home";
 import SpendRater from "./pages/SpendRater";
@@ -58,11 +59,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <ThemeInit />
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <AppShell />
-        </WouterRouter>
-        <Toaster />
+        <I18nProvider>
+          <ThemeInit />
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <AppShell />
+          </WouterRouter>
+          <Toaster />
+        </I18nProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

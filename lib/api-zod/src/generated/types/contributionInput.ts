@@ -7,6 +7,10 @@
  */
 
 export interface ContributionInput {
-  /** Amount to add in JD */
+  /**
+     * Amount to add in JD
+     * @minimum 0.01
+     * @maximum 100000000
+     */
   amount: number;
 }

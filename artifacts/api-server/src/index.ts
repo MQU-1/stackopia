@@ -15,6 +15,17 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
+if (!process.env["DATABASE_URL"]) {
+  throw new Error(
+    "DATABASE_URL environment variable is required but was not provided.",
+  );
+}
+
+const missingAiKey = !process.env["ANTHROPIC_API_KEY"];
+if (missingAiKey) {
+  logger.warn("ANTHROPIC_API_KEY is not set — AI endpoints will return 503.");
+}
+
 app.listen(port, (err) => {
   if (err) {
     logger.error({ err }, "Error listening on port");

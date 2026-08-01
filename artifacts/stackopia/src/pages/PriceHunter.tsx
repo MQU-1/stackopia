@@ -11,6 +11,7 @@ import { toast } from "@workspace/stackopia-ds/hooks/use-toast";
 import { useHuntPrices } from "@workspace/api-client-react";
 import type { PriceHuntResult, PriceStore } from "@workspace/api-client-react";
 import { Search, Store, Globe, ArrowUpDown } from "lucide-react";
+import { PageHeader } from "../components/PageHeader";
 
 const schema = z.object({
   query: z.string().min(2, "Enter a product to search"),
@@ -123,10 +124,11 @@ export default function PriceHunter() {
 
   return (
     <div className="min-h-[100dvh] max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Price Hunter</h1>
-        <p className="text-muted-foreground text-sm">Compare prices across Amman stores and online. Find the real deal.</p>
-      </div>
+      <PageHeader
+        eyebrow="Price comparison"
+        title="Price Hunter"
+        description="Compare prices across Amman stores and online. Find the real deal."
+      />
 
       <Card data-testid="card-price-form">
         <CardHeader>

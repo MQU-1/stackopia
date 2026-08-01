@@ -12,6 +12,7 @@ import { useRateSpend } from "@workspace/api-client-react";
 import type { SpendRateResult } from "@workspace/api-client-react";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@workspace/stackopia-ds/lib/utils";
+import { PageHeader } from "../components/PageHeader";
 
 const schema = z.object({
   item: z.string().min(1, "Tell me what you bought"),
@@ -115,10 +116,11 @@ export default function SpendRater() {
 
   return (
     <div className="min-h-[100dvh] max-w-2xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-foreground mb-1">Spend Rater</h1>
-        <p className="text-muted-foreground text-sm">Drop your purchase details. Get brutally honest AI feedback.</p>
-      </div>
+      <PageHeader
+        eyebrow="AI spend scoring"
+        title="Spend Rater"
+        description="Drop your purchase details. Get brutally honest AI feedback."
+      />
 
       <Card data-testid="card-spend-form">
         <CardHeader>

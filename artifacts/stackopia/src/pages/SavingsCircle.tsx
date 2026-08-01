@@ -21,6 +21,7 @@ import {
 import type { SavingsCircle } from "@workspace/api-client-react";
 import { Plus, PiggyBank, Target } from "lucide-react";
 import { cn } from "@workspace/stackopia-ds/lib/utils";
+import { PageHeader } from "../components/PageHeader";
 
 // Schemas
 const createSchema = z.object({
@@ -262,12 +263,15 @@ export default function SavingsCirclePage() {
 
   return (
     <div className="min-h-[100dvh] max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">Savings Circles</h1>
-          <p className="text-muted-foreground text-sm">Goal-based circles that keep you accountable.</p>
+      <div className="flex items-start justify-between mb-8 gap-4">
+        <PageHeader
+          eyebrow="Goal-based saving"
+          title="Savings Circles"
+          description="Goal-based circles that keep you accountable."
+        />
+        <div className="shrink-0">
+          <CreateCircleDialog />
         </div>
-        <CreateCircleDialog />
       </div>
 
       {isLoading && (

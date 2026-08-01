@@ -24,3 +24,5 @@ export * from './spendRateInput';
 export * from './spendRateResult';
 export * from './tribeProfile';
 export * from './tribeProfileInput';
+export * from './waitlistEntry';
+export * from './waitlistInput';

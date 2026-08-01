@@ -8,7 +8,11 @@
 import type { InvestPlanInputRisk } from './investPlanInputRisk';
 
 export interface InvestPlanInput {
-  /** Amount available to invest in JD */
+  /**
+     * Amount available to invest in JD
+     * @minimum 0
+     * @maximum 100000000
+     */
   amount: number;
   risk: InvestPlanInputRisk;
 }

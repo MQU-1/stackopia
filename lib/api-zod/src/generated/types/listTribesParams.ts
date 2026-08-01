@@ -7,6 +7,12 @@
  */
 
 export type ListTribesParams = {
+/**
+ * @maxLength 120
+ */
 city?: string;
+/**
+ * @maxLength 200
+ */
 goal?: string;
 };

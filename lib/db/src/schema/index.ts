@@ -1,6 +1,21 @@
 import { pgTable, serial, text, real, date, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod";
+
+// ─── Waitlist ─────────────────────────────────────────────────────────────────
+
+export const waitlistTable = pgTable("waitlist", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const insertWaitlistSchema = createInsertSchema(waitlistTable).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertWaitlist = typeof waitlistTable.$inferInsert;
+export type WaitlistEntry = typeof waitlistTable.$inferSelect;
 
 // ─── Savings Circles ─────────────────────────────────────────────────────────
 
@@ -20,7 +35,7 @@ export const insertSavingsCircleSchema = createInsertSchema(savingsCirclesTable)
   createdAt: true,
 });
 
-export type InsertSavingsCircle = z.infer<typeof insertSavingsCircleSchema>;
+export type InsertSavingsCircle = typeof savingsCirclesTable.$inferInsert;
 export type SavingsCircle = typeof savingsCirclesTable.$inferSelect;
 
 // ─── Tribe Profiles ───────────────────────────────────────────────────────────
@@ -39,7 +54,7 @@ export const insertTribeProfileSchema = createInsertSchema(tribeProfilesTable).o
   createdAt: true,
 });
 
-export type InsertTribeProfile = z.infer<typeof insertTribeProfileSchema>;
+export type InsertTribeProfile = typeof tribeProfilesTable.$inferInsert;
 export type TribeProfile = typeof tribeProfilesTable.$inferSelect;
 
 // ─── AI query log (for dashboard aiQueriesToday counter) ─────────────────────

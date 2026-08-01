@@ -17,71 +17,146 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
+ * @summary Join the launch waitlist
+ */
+export const joinWaitlistBodyEmailMax = 254;
+
+
+export const joinWaitlistBodyEmailRegExp = new RegExp('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
+export const joinWaitlistBodyWebsiteMax = 200;
+
+
+
+export const JoinWaitlistBody = zod.object({
+  "email": zod.string().max(joinWaitlistBodyEmailMax).regex(joinWaitlistBodyEmailRegExp).describe('Email address to join the waitlist'),
+  "website": zod.string().max(joinWaitlistBodyWebsiteMax).optional()
+})
+
+export const JoinWaitlistResponse = zod.object({
+  "id": zod.number(),
+  "email": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
  * Uses AI to score a purchase 1–10 with a verdict and honest insight.
  * @summary Rate a purchase decision
  */
+export const rateSpendBodyItemMax = 200;
+
+export const rateSpendBodyAmountMin = 0;
+export const rateSpendBodyAmountMax = 10000000;
+
+export const rateSpendBodyContextMax = 1000;
+
+
+
 export const RateSpendBody = zod.object({
-  "item": zod.string().describe('What was purchased'),
-  "amount": zod.number().describe('Amount in JD'),
-  "context": zod.string().optional().describe('Optional context about the purchase')
+  "item": zod.string().max(rateSpendBodyItemMax).describe('What was purchased'),
+  "amount": zod.number().min(rateSpendBodyAmountMin).max(rateSpendBodyAmountMax).describe('Amount in JD'),
+  "context": zod.string().max(rateSpendBodyContextMax).optional().describe('Optional context about the purchase')
 })
 
 export const rateSpendResponseScoreMax = 10;
+
+export const rateSpendResponseVerdictMax = 100;
+
+export const rateSpendResponseInsightMax = 1000;
 
 
 
 export const RateSpendResponse = zod.object({
   "score": zod.number().min(1).max(rateSpendResponseScoreMax),
-  "verdict": zod.string().describe('Short verdict label (e.g. \"Great Investment\")'),
-  "insight": zod.string().describe('Two-sentence honest explanation')
+  "verdict": zod.string().max(rateSpendResponseVerdictMax).describe('Short verdict label (e.g. \"Great Investment\")'),
+  "insight": zod.string().max(rateSpendResponseInsightMax).describe('Two-sentence honest explanation')
 })
 
 
 /**
  * @summary Generate a personalised investment plan
  */
+export const getInvestPlanBodyAmountMin = 0;
+export const getInvestPlanBodyAmountMax = 100000000;
+
+
+
 export const GetInvestPlanBody = zod.object({
-  "amount": zod.number().describe('Amount available to invest in JD'),
+  "amount": zod.number().min(getInvestPlanBodyAmountMin).max(getInvestPlanBodyAmountMax).describe('Amount available to invest in JD'),
   "risk": zod.enum(['safe', 'balanced', 'growth', 'halal'])
 })
 
+export const getInvestPlanResponseSummaryMax = 2000;
+
+export const getInvestPlanResponseAllocationsItemLabelMax = 60;
+
+export const getInvestPlanResponseAllocationsItemColorRegExp = new RegExp('^#[0-9a-fA-F]{6}$');
+export const getInvestPlanResponseAdviceMax = 2000;
+
+
+
 export const GetInvestPlanResponse = zod.object({
-  "summary": zod.string(),
+  "summary": zod.string().max(getInvestPlanResponseSummaryMax),
   "allocations": zod.array(zod.object({
-  "label": zod.string(),
+  "label": zod.string().max(getInvestPlanResponseAllocationsItemLabelMax),
   "percent": zod.number(),
-  "color": zod.string().describe('Hex color code for the chart segment')
+  "color": zod.string().regex(getInvestPlanResponseAllocationsItemColorRegExp).describe('Hex color code for the chart segment')
 })),
-  "advice": zod.string()
+  "advice": zod.string().max(getInvestPlanResponseAdviceMax)
 })
 
 
 /**
  * @summary Find prices across Amman shops and online stores
  */
+export const huntPricesBodyQueryMax = 200;
+
+
+
 export const HuntPricesBody = zod.object({
-  "query": zod.string().describe('Product to search for')
+  "query": zod.string().max(huntPricesBodyQueryMax).describe('Product to search for')
 })
 
+export const huntPricesResponseTitleMax = 200;
+
+export const huntPricesResponseStoresItemNameMax = 100;
+
+export const huntPricesResponseStoresItemTypeMax = 60;
+
+export const huntPricesResponseStoresItemNoteMax = 500;
+
+export const huntPricesResponseStoresItemPriceMin = 0;
+export const huntPricesResponseStoresItemPriceMax = 100000000;
+
+export const huntPricesResponseTipMax = 1000;
+
+
+
 export const HuntPricesResponse = zod.object({
-  "title": zod.string(),
+  "title": zod.string().max(huntPricesResponseTitleMax),
   "stores": zod.array(zod.object({
-  "name": zod.string(),
-  "type": zod.string().describe('Store type (e.g. \"Local Tech Store\", \"Amazon\")'),
-  "note": zod.string(),
-  "price": zod.number().describe('Price in JD')
+  "name": zod.string().max(huntPricesResponseStoresItemNameMax),
+  "type": zod.string().max(huntPricesResponseStoresItemTypeMax).describe('Store type (e.g. \"Local Tech Store\", \"Amazon\")'),
+  "note": zod.string().max(huntPricesResponseStoresItemNoteMax),
+  "price": zod.number().min(huntPricesResponseStoresItemPriceMin).max(huntPricesResponseStoresItemPriceMax).describe('Price in JD')
 })),
-  "tip": zod.string()
+  "tip": zod.string().max(huntPricesResponseTipMax)
 })
 
 
 /**
  * @summary List all savings circles
  */
+export const listSavingsCirclesResponseNameMax = 120;
+
+export const listSavingsCirclesResponseGoalNameMax = 120;
+
+
+
 export const ListSavingsCirclesResponseItem = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goalName": zod.string(),
+  "name": zod.string().max(listSavingsCirclesResponseNameMax),
+  "goalName": zod.string().max(listSavingsCirclesResponseGoalNameMax),
   "goalAmount": zod.number().describe('Target in JD'),
   "savedAmount": zod.number().describe('Amount saved so far in JD'),
   "deadline": zod.coerce.date(),
@@ -93,17 +168,31 @@ export const ListSavingsCirclesResponse = zod.array(ListSavingsCirclesResponseIt
 /**
  * @summary Create a new savings circle
  */
+export const createSavingsCircleBodyNameMax = 120;
+
+export const createSavingsCircleBodyGoalNameMax = 120;
+
+export const createSavingsCircleBodyGoalAmountMax = 100000000;
+
+
+
 export const CreateSavingsCircleBody = zod.object({
-  "name": zod.string(),
-  "goalName": zod.string(),
-  "goalAmount": zod.number(),
+  "name": zod.string().max(createSavingsCircleBodyNameMax),
+  "goalName": zod.string().max(createSavingsCircleBodyGoalNameMax),
+  "goalAmount": zod.number().min(1).max(createSavingsCircleBodyGoalAmountMax),
   "deadline": zod.coerce.date()
 })
 
+export const createSavingsCircleResponseNameMax = 120;
+
+export const createSavingsCircleResponseGoalNameMax = 120;
+
+
+
 export const CreateSavingsCircleResponse = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goalName": zod.string(),
+  "name": zod.string().max(createSavingsCircleResponseNameMax),
+  "goalName": zod.string().max(createSavingsCircleResponseGoalNameMax),
   "goalAmount": zod.number().describe('Target in JD'),
   "savedAmount": zod.number().describe('Amount saved so far in JD'),
   "deadline": zod.coerce.date(),
@@ -118,10 +207,16 @@ export const GetSavingsCircleParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const getSavingsCircleResponseNameMax = 120;
+
+export const getSavingsCircleResponseGoalNameMax = 120;
+
+
+
 export const GetSavingsCircleResponse = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goalName": zod.string(),
+  "name": zod.string().max(getSavingsCircleResponseNameMax),
+  "goalName": zod.string().max(getSavingsCircleResponseGoalNameMax),
   "goalAmount": zod.number().describe('Target in JD'),
   "savedAmount": zod.number().describe('Amount saved so far in JD'),
   "deadline": zod.coerce.date(),
@@ -136,14 +231,25 @@ export const AddContributionParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const addContributionBodyAmountMin = 0.01;
+export const addContributionBodyAmountMax = 100000000;
+
+
+
 export const AddContributionBody = zod.object({
-  "amount": zod.number().describe('Amount to add in JD')
+  "amount": zod.number().min(addContributionBodyAmountMin).max(addContributionBodyAmountMax).describe('Amount to add in JD')
 })
+
+export const addContributionResponseNameMax = 120;
+
+export const addContributionResponseGoalNameMax = 120;
+
+
 
 export const AddContributionResponse = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goalName": zod.string(),
+  "name": zod.string().max(addContributionResponseNameMax),
+  "goalName": zod.string().max(addContributionResponseGoalNameMax),
   "goalAmount": zod.number().describe('Target in JD'),
   "savedAmount": zod.number().describe('Amount saved so far in JD'),
   "deadline": zod.coerce.date(),
@@ -154,17 +260,33 @@ export const AddContributionResponse = zod.object({
 /**
  * @summary List tribe profiles
  */
+export const listTribesQueryCityMax = 120;
+
+export const listTribesQueryGoalMax = 200;
+
+
+
 export const ListTribesQueryParams = zod.object({
-  "city": zod.coerce.string().optional(),
-  "goal": zod.coerce.string().optional()
+  "city": zod.coerce.string().max(listTribesQueryCityMax).optional(),
+  "goal": zod.coerce.string().max(listTribesQueryGoalMax).optional()
 })
+
+export const listTribesResponseNameMax = 120;
+
+export const listTribesResponseGoalMax = 200;
+
+export const listTribesResponseCityMax = 120;
+
+export const listTribesResponseBioMax = 1000;
+
+
 
 export const ListTribesResponseItem = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goal": zod.string(),
-  "city": zod.string(),
-  "bio": zod.string().nullish(),
+  "name": zod.string().max(listTribesResponseNameMax),
+  "goal": zod.string().max(listTribesResponseGoalMax),
+  "city": zod.string().max(listTribesResponseCityMax),
+  "bio": zod.string().max(listTribesResponseBioMax).nullish(),
   "createdAt": zod.coerce.date()
 })
 export const ListTribesResponse = zod.array(ListTribesResponseItem)
@@ -173,19 +295,39 @@ export const ListTribesResponse = zod.array(ListTribesResponseItem)
 /**
  * @summary Create a tribe profile
  */
+export const createTribeProfileBodyNameMax = 120;
+
+export const createTribeProfileBodyGoalMax = 200;
+
+export const createTribeProfileBodyCityMax = 120;
+
+export const createTribeProfileBodyBioMax = 1000;
+
+
+
 export const CreateTribeProfileBody = zod.object({
-  "name": zod.string(),
-  "goal": zod.string(),
-  "city": zod.string(),
-  "bio": zod.string().optional()
+  "name": zod.string().max(createTribeProfileBodyNameMax),
+  "goal": zod.string().max(createTribeProfileBodyGoalMax),
+  "city": zod.string().max(createTribeProfileBodyCityMax),
+  "bio": zod.string().max(createTribeProfileBodyBioMax).optional()
 })
+
+export const createTribeProfileResponseNameMax = 120;
+
+export const createTribeProfileResponseGoalMax = 200;
+
+export const createTribeProfileResponseCityMax = 120;
+
+export const createTribeProfileResponseBioMax = 1000;
+
+
 
 export const CreateTribeProfileResponse = zod.object({
   "id": zod.number(),
-  "name": zod.string(),
-  "goal": zod.string(),
-  "city": zod.string(),
-  "bio": zod.string().nullish(),
+  "name": zod.string().max(createTribeProfileResponseNameMax),
+  "goal": zod.string().max(createTribeProfileResponseGoalMax),
+  "city": zod.string().max(createTribeProfileResponseCityMax),
+  "bio": zod.string().max(createTribeProfileResponseBioMax).nullish(),
   "createdAt": zod.coerce.date()
 })
 

@@ -8,10 +8,16 @@
 
 export interface TribeProfile {
   id: number;
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 200 */
   goal: string;
+  /** @maxLength 120 */
   city: string;
-  /** @nullable */
+  /**
+     * @maxLength 1000
+     * @nullable
+     */
   bio?: string | null;
   createdAt: Date;
 }

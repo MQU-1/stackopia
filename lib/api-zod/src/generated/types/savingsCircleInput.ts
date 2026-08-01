@@ -7,8 +7,14 @@
  */
 
 export interface SavingsCircleInput {
+  /** @maxLength 120 */
   name: string;
+  /** @maxLength 120 */
   goalName: string;
+  /**
+     * @minimum 1
+     * @maximum 100000000
+     */
   goalAmount: number;
   deadline: Date;
 }

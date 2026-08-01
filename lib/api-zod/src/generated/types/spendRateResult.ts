@@ -12,8 +12,14 @@ export interface SpendRateResult {
      * @maximum 10
      */
   score: number;
-  /** Short verdict label (e.g. "Great Investment") */
+  /**
+     * Short verdict label (e.g. "Great Investment")
+     * @maxLength 100
+     */
   verdict: string;
-  /** Two-sentence honest explanation */
+  /**
+     * Two-sentence honest explanation
+     * @maxLength 1000
+     */
   insight: string;
 }

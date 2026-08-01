@@ -8,7 +8,9 @@
 import type { InvestAllocation } from './investAllocation';
 
 export interface InvestPlanResult {
+  /** @maxLength 2000 */
   summary: string;
   allocations: InvestAllocation[];
+  /** @maxLength 2000 */
   advice: string;
 }

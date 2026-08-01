@@ -7,10 +7,19 @@
  */
 
 export interface PriceStore {
+  /** @maxLength 100 */
   name: string;
-  /** Store type (e.g. "Local Tech Store", "Amazon") */
+  /**
+     * Store type (e.g. "Local Tech Store", "Amazon")
+     * @maxLength 60
+     */
   type: string;
+  /** @maxLength 500 */
   note: string;
-  /** Price in JD */
+  /**
+     * Price in JD
+     * @minimum 0
+     * @maximum 100000000
+     */
   price: number;
 }

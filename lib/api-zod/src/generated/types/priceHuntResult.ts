@@ -8,7 +8,9 @@
 import type { PriceStore } from './priceStore';
 
 export interface PriceHuntResult {
+  /** @maxLength 200 */
   title: string;
   stores: PriceStore[];
+  /** @maxLength 1000 */
   tip: string;
 }

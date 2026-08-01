@@ -8,6 +8,7 @@ import {
   AddContributionParams,
   AddContributionBody,
 } from "@workspace/api-zod";
+import { mutationRateLimit } from "../middlewares/rate-limit";
 
 const router: IRouter = Router();
 
@@ -32,7 +33,7 @@ router.get("/savings-circles", async (_req, res) => {
 
 // ─── POST /savings-circles ────────────────────────────────────────────────────
 
-router.post("/savings-circles", async (req, res) => {
+router.post("/savings-circles", mutationRateLimit, async (req, res) => {
   const parsed = CreateSavingsCircleBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -75,7 +76,7 @@ router.get("/savings-circles/:id", async (req, res) => {
 
 // ─── PATCH /savings-circles/:id/contribution ─────────────────────────────────
 
-router.patch("/savings-circles/:id/contribution", async (req, res) => {
+router.patch("/savings-circles/:id/contribution", mutationRateLimit, async (req, res) => {
   const params = AddContributionParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
