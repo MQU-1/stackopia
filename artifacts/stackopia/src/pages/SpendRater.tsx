@@ -107,8 +107,8 @@ export default function SpendRater() {
           setResult(data);
           toast({ title: "Rated!", description: `Score: ${data.score}/10 — ${data.verdict}` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Could not rate your spend. Try again.", variant: "destructive" });
+        onError: (err) => {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
         },
       }
     );

@@ -115,8 +115,8 @@ export default function PriceHunter() {
           setResult(data);
           toast({ title: "Prices found!", description: `${data.stores.length} stores compared.` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Could not hunt prices. Try again.", variant: "destructive" });
+        onError: (err) => {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
         },
       }
     );

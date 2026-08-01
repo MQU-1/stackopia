@@ -142,8 +142,8 @@ export default function InvestCoach() {
           setResult(data);
           toast({ title: "Plan ready!", description: `${data.allocations.length} allocations generated.` });
         },
-        onError: () => {
-          toast({ title: "Error", description: "Could not generate plan. Try again.", variant: "destructive" });
+        onError: (err) => {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
         },
       }
     );
