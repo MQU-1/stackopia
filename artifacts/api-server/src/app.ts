@@ -47,8 +47,9 @@ app.use(
 );
 
 // CORS is locked to an explicit allowlist. Configure `CORS_ALLOWED_ORIGINS`
-// (comma-separated) for production. Common local dev origins are allowed by
-// default so the Vite dev server can reach the API without a proxy.
+// (comma-separated) for production. Same-origin requests (SPA and API served
+// from the same host, as on Replit) are always allowed even when the browser
+// sends an `Origin` header on POSTs.
 const DEV_ALLOWED_ORIGINS = [
   "http://localhost:3000",
   "http://localhost:5000",
@@ -67,16 +68,27 @@ const ALLOWED_ORIGINS = [
   ...(process.env.NODE_ENV === "production" ? [] : DEV_ALLOWED_ORIGINS),
 ];
 
+const isSameOrigin = (origin: string | undefined, host: string | undefined) => {
+  if (!origin || !host) return false;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+};
+
 app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-        callback(null, true);
-        return;
-      }
-      callback(new Error("Origin not allowed by CORS policy"));
-    },
-    methods: ["GET", "POST", "PATCH", "OPTIONS"],
+  cors((req, callback) => {
+    const origin = req.headers.origin;
+    if (
+      !origin ||
+      ALLOWED_ORIGINS.includes(origin) ||
+      isSameOrigin(origin, req.headers.host)
+    ) {
+      callback(null, { origin });
+      return;
+    }
+    callback(new Error("Origin not allowed by CORS policy"));
   }),
 );
 
@@ -114,8 +126,14 @@ const PUBLIC_DIR = process.env.PUBLIC_DIR;
 if (PUBLIC_DIR && existsSync(path.resolve(PUBLIC_DIR, "index.html"))) {
   const publicDir = path.resolve(PUBLIC_DIR);
   app.use(express.static(publicDir, { index: false, maxAge: "1d" }));
-  app.get("*", (_req, res) => {
-    res.sendFile(path.join(publicDir, "index.html"));
+  // Express 5 dropped bare "*" route paths; use a catch-all middleware to
+  // hand SPA routes (/, /tools/...) back to index.html.
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/api/")) {
+      res.sendFile(path.join(publicDir, "index.html"));
+      return;
+    }
+    next();
   });
   logger.info({ publicDir }, "Serving static frontend");
 }
