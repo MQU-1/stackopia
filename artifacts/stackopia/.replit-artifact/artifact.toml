@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Stackopia"
+description = "Stackopia — an AI-powered financial coaching web app for Jordanian users. Features: Spend Rater (AI scores purchases 1-10), Savings Circle (group savings tracker), Invest Coach (AI investment allocation), Price Hunter (AI price comparison across Amman shops and online), and Find Your Tribe (connect with people sharing financial goals). Dark-first with lime-green accent, card-boxed layout, Syne + DM Sans typography. Calls Anthropic Claude via a backend AI proxy."
+version = "1.0.0"
+id = "artifacts/stackopia"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20948
+
+[services.development]
+run = "pnpm --filter @workspace/stackopia run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/stackopia", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/stackopia/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20948"
+BASE_PATH = "/"

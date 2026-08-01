@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
+  # Do not change the title — it controls generated filenames.
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Stackopia API — AI-powered financial coaching, savings circles, invest plans, price hunting, and tribe matching.
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: ai
+    description: AI-powered financial analysis
+  - name: savings
+    description: Savings circles
+  - name: tribes
+    description: Tribe community
+  - name: dashboard
+    description: Summary and stats
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,273 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── AI endpoints ────────────────────────────────────────────────────────────
+
+  /ai/spend-rate:
+    post:
+      operationId: rateSpend
+      tags: [ai]
+      summary: Rate a purchase decision
+      description: Uses AI to score a purchase 1–10 with a verdict and honest insight.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpendRateInput"
+      responses:
+        "200":
+          description: Spend rating result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpendRateResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: AI service error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/invest-plan:
+    post:
+      operationId: getInvestPlan
+      tags: [ai]
+      summary: Generate a personalised investment plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InvestPlanInput"
+      responses:
+        "200":
+          description: Investment plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvestPlanResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: AI service error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/price-hunt:
+    post:
+      operationId: huntPrices
+      tags: [ai]
+      summary: Find prices across Amman shops and online stores
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceHuntInput"
+      responses:
+        "200":
+          description: Price comparison result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceHuntResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: AI service error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Savings circles ─────────────────────────────────────────────────────────
+
+  /savings-circles:
+    get:
+      operationId: listSavingsCircles
+      tags: [savings]
+      summary: List all savings circles
+      responses:
+        "200":
+          description: List of savings circles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SavingsCircle"
+
+    post:
+      operationId: createSavingsCircle
+      tags: [savings]
+      summary: Create a new savings circle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SavingsCircleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavingsCircle"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /savings-circles/{id}:
+    get:
+      operationId: getSavingsCircle
+      tags: [savings]
+      summary: Get a savings circle by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Savings circle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavingsCircle"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /savings-circles/{id}/contribution:
+    patch:
+      operationId: addContribution
+      tags: [savings]
+      summary: Add a contribution to a savings circle
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContributionInput"
+      responses:
+        "200":
+          description: Updated circle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavingsCircle"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Tribe ───────────────────────────────────────────────────────────────────
+
+  /tribes:
+    get:
+      operationId: listTribes
+      tags: [tribes]
+      summary: List tribe profiles
+      parameters:
+        - in: query
+          name: city
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: goal
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of tribe profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TribeProfile"
+
+    post:
+      operationId: createTribeProfile
+      tags: [tribes]
+      summary: Create a tribe profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TribeProfileInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TribeProfile"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ─── Dashboard summary (wow endpoint) ────────────────────────────────────────
+
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get aggregated dashboard stats
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +309,210 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    # ── AI schemas ──────────────────────────────────────────────────────────────
+
+    SpendRateInput:
+      type: object
+      required: [item, amount]
+      properties:
+        item:
+          type: string
+          description: What was purchased
+        amount:
+          type: number
+          description: Amount in JD
+        context:
+          type: string
+          description: Optional context about the purchase
+
+    SpendRateResult:
+      type: object
+      required: [score, verdict, insight]
+      properties:
+        score:
+          type: integer
+          minimum: 1
+          maximum: 10
+        verdict:
+          type: string
+          description: Short verdict label (e.g. "Great Investment")
+        insight:
+          type: string
+          description: Two-sentence honest explanation
+
+    InvestPlanInput:
+      type: object
+      required: [amount, risk]
+      properties:
+        amount:
+          type: number
+          description: Amount available to invest in JD
+        risk:
+          type: string
+          enum: [safe, balanced, growth, halal]
+
+    InvestAllocation:
+      type: object
+      required: [label, percent, color]
+      properties:
+        label:
+          type: string
+        percent:
+          type: number
+        color:
+          type: string
+          description: Hex color code for the chart segment
+
+    InvestPlanResult:
+      type: object
+      required: [summary, allocations, advice]
+      properties:
+        summary:
+          type: string
+        allocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvestAllocation"
+        advice:
+          type: string
+
+    PriceHuntInput:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          description: Product to search for
+
+    PriceStore:
+      type: object
+      required: [name, type, note, price]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          description: Store type (e.g. "Local Tech Store", "Amazon")
+        note:
+          type: string
+        price:
+          type: number
+          description: Price in JD
+
+    PriceHuntResult:
+      type: object
+      required: [title, stores, tip]
+      properties:
+        title:
+          type: string
+        stores:
+          type: array
+          items:
+            $ref: "#/components/schemas/PriceStore"
+        tip:
+          type: string
+
+    # ── Savings schemas ─────────────────────────────────────────────────────────
+
+    SavingsCircle:
+      type: object
+      required: [id, name, goalName, goalAmount, savedAmount, deadline, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        goalName:
+          type: string
+        goalAmount:
+          type: number
+          description: Target in JD
+        savedAmount:
+          type: number
+          description: Amount saved so far in JD
+        deadline:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+
+    SavingsCircleInput:
+      type: object
+      required: [name, goalName, goalAmount, deadline]
+      properties:
+        name:
+          type: string
+        goalName:
+          type: string
+        goalAmount:
+          type: number
+        deadline:
+          type: string
+          format: date
+
+    ContributionInput:
+      type: object
+      required: [amount]
+      properties:
+        amount:
+          type: number
+          description: Amount to add in JD
+
+    # ── Tribe schemas ───────────────────────────────────────────────────────────
+
+    TribeProfile:
+      type: object
+      required: [id, name, goal, city, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        goal:
+          type: string
+        city:
+          type: string
+        bio:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    TribeProfileInput:
+      type: object
+      required: [name, goal, city]
+      properties:
+        name:
+          type: string
+        goal:
+          type: string
+        city:
+          type: string
+        bio:
+          type: string
+
+    # ── Dashboard schemas ────────────────────────────────────────────────────────
+
+    DashboardSummary:
+      type: object
+      required: [totalSaved, circleCount, tribeCount, aiQueriesToday]
+      properties:
+        totalSaved:
+          type: number
+          description: Sum of all savedAmount across circles in JD
+        circleCount:
+          type: integer
+        tribeCount:
+          type: integer
+        aiQueriesToday:
+          type: integer
+          description: Number of AI queries made today

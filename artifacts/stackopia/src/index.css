@@ -1,0 +1,3 @@
+/* Stackopia design tokens + component theme from the shared design system.
+   Never add token overrides here — edit artifacts/stackopia-ds/tokens.json instead. */
+@import "@workspace/stackopia-ds/styles.css";

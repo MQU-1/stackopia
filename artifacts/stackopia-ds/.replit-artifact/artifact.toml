@@ -1,0 +1,19 @@
+kind = "design-system"
+previewPath = "/stackopia-ds/"
+title = "Stackopia Design System"
+description = "Design system for Stackopia — an AI-powered financial coaching app targeting Jordanian users. Dark-first with lime-green accent (#C8F135), Syne display headings, DM Sans body text. Covers both dark and light modes with a card-based, boxed layout language."
+version = "1.0.0"
+id = "artifacts/stackopia-ds"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/stackopia-ds/" ]
+localPort = 21054
+
+[services.development]
+run = "pnpm --filter @workspace/stackopia-ds run dev"
+
+[services.env]
+PORT = "21054"
+BASE_PATH = "/stackopia-ds/"
